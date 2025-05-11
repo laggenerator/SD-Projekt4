@@ -2,24 +2,26 @@
 #define ADJ_LIST
 #include "dynamic_array.hh"
 #include "list.hh"
+#include "pair.hh"
 
 //numerujmy wierzchołki od 0, size_t
+//wierzchołki przechowywane jako pary, gdzie klucz to waga, wartosc to numer wierzcholka
 class AdjacencyList {
 private:
   //tablica na listy przechowujące wierzchołki, na indeksie i jest lista sąsiadów i-tego wierzchołka
   //wazne ze skierowany, jesli jest 1 -> 2, to dane[1] bedzie 2, ale dane[2] nie ma 1
-  DynamicArray<List<size_t>> dane;
+  DynamicArray<List<Pair>> dane;
 public:
   //podaje sie ile wierzcholkow i juz sie tego nie rusza
   AdjacencyList(size_t n_wierzcholki) {
     dane.resize(n_wierzcholki);
     for(size_t j = 0; j < n_wierzcholki; ++j) {
-      List<size_t> l0; dane.push_back(l0);
+      dane.push_back(List<Pair>());
     }
   }
 
   //dodawanie, jednokierunkowe!
-  void add_edge(size_t skad, size_t dokad);
+  void add_edge(size_t skad, size_t dokad, int waga);
   //usuwanie, skierowane tez
   void remove_edge(size_t skad, size_t dokad);
   //liczba krawedzi wchodzacych do i
@@ -29,28 +31,33 @@ public:
   //czy w ogole jest
   bool has_edge(size_t skad, size_t dokad) const;
   //zwraca liste sasiadow, przyda sie w tak zwanej didżistrze
-  const List<size_t>& neighbors(size_t i) const;
+  const List<Pair>& neighbors(size_t i) const;
 
   //de facto ilosc krawedzi
-  size_t vertex_count() { return dane.size(); }
+  size_t vertex_count() const { return dane.size(); }
   //( ͡°͜ʖ ͡°)
-  size_t edge_count() { return dane.size(); }
+  size_t edge_count() const {
+    size_t rezultat = 0;
+    for(size_t i = 0; i < dane.size(); ++i)
+      rezultat += dane[i].get_size();
+    return rezultat;
+  }
 
   void _show() { dane._show(); }
 };
 
-void AdjacencyList::add_edge(size_t skad, size_t dokad) {
+void AdjacencyList::add_edge(size_t skad, size_t dokad, int waga) {
   if((skad > dokad ? skad : dokad) >= dane.size()) //jesli probuje stworzyc krawedz nieistniejącą bo do nieistniejącego wierzchołka
     throw std::invalid_argument("Próba stworzenia krawędzi do nieistniejącego wierzchołka!");
 
-  dane[skad].push_back(dokad); //nie sprawdza czy nie doda pare razy, zreszta to tylko troche spowolni dzialanie a nie zepsuje
+  dane[skad].push_back(Pair(waga, dokad)); //nie sprawdza czy nie doda pare razy, zreszta to tylko troche spowolni dzialanie a nie zepsuje
 }
 
 void AdjacencyList::remove_edge(size_t skad, size_t dokad) {
   if((skad > dokad ? skad : dokad) >= dane.size()) //jesli probuje stworzyc krawedz nieistniejącą bo do nieistniejącego wierzchołka
     throw std::invalid_argument("Próba usunięcia krawędzi do nieistniejącego wierzchołka!");
 
-  size_t indeks = dane[skad].find_index(dokad); //da size jesli nie ma tej wartosci tam
+  size_t indeks = dane[skad].find_index(Pair(dokad, 0)); //da size jesli nie ma tej wartosci tam
   if(indeks == dane.size())
     throw std::invalid_argument("Próba usunięcia niestniejącej krawędzi do wierzchołka!");
   dane[skad].remove_at(indeks);
@@ -63,7 +70,7 @@ size_t AdjacencyList::indeg(size_t i) const {
 
   int rezultat = 0;
   for(size_t j = 0; j < dane.size(); ++j) {
-    if(dane[i].find(i) != nullptr && j != i)
+    if(dane[i].find(Pair(i, 0)) != nullptr && j != i)
       rezultat++;
   }
   return rezultat;
@@ -79,10 +86,10 @@ size_t AdjacencyList::outdeg(size_t i) const {
 bool AdjacencyList::has_edge(size_t skad, size_t dokad) const {
   if((skad > dokad ? skad : dokad) >= dane.size()) //jesli probuje stworzyc krawedz nieistniejącą bo do nieistniejącego wierzchołka
     return false;
-  return (dane[skad].find(dokad) != nullptr);
+  return (dane[skad].find(Pair(dokad, 0)) != nullptr);
 }
 
-const List<size_t>& AdjacencyList::neighbors(size_t i) const {
+const List<Pair>& AdjacencyList::neighbors(size_t i) const {
   if(i >= dane.size()) //jesli probuje stworzyc krawedz nieistniejącą bo do nieistniejącego wierzchołka
     throw std::invalid_argument("Próba pobrania sąsiadów nieistniejącego wierzchołka");
   return dane[i];

@@ -3,8 +3,8 @@ CXXFLAGS = -Wall -Wextra -pedantic -std=c++17 -O0
 
 TARGET = egzek
 
-SRCS = main.cpp
-HEADERS = ./struktury/dynamic_array.hh ./struktury/list.hh ./struktury/adjacency_list.hh
+SRCS = main.cpp ./struktury/heap.cpp
+HEADERS = ./struktury/dynamic_array.hh ./struktury/list.hh ./struktury/adjacency_list.hh ./struktury/pair.hh ./struktury/heap.hh ./struktury/prique.hh
 
 all: $(TARGET)
 

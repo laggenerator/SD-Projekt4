@@ -34,11 +34,19 @@ class List {
   
 public:
   List() { head = nullptr; tail = nullptr; size = 0;}
+  List(const List<T>& other) : head(nullptr), tail(nullptr), size(0) {
+    Node<T>* current = other.head;
+    while(current != nullptr) {
+      push_back(current->value());
+      current = current->next;
+    }
+  }
   ~List() {
-    // if(size > 0) std::cout << "Usuwam liste rozmiaru: " << size << " " << *this << std::endl;
+    //if(size > 0) std::cout << "Usuwam liste rozmiaru: " << size << " " << *this << std::endl;
     Node<T>* iter = head;
     while (iter != nullptr) {
       Node<T>* temp = iter;
+      //std::cout << temp << std::endl;
       iter = iter->next;
       delete temp;
     }
