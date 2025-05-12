@@ -19,7 +19,7 @@ public:
 
   void modify_key(int val, int z) { dane.modify_key(val, z); };
   void _show() { dane._show(); }
-  size_t size() { return dane.size(); }
+  size_t size() { return dane.get_size(); }
 };
 
 #endif

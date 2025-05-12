@@ -34,11 +34,11 @@ public:
   const List<Pair>& neighbors(size_t i) const;
 
   //de facto ilosc krawedzi
-  size_t vertex_count() const { return dane.size(); }
+  size_t vertex_count() const { return dane.get_size(); }
   //( ͡°͜ʖ ͡°)
   size_t edge_count() const {
     size_t rezultat = 0;
-    for(size_t i = 0; i < dane.size(); ++i)
+    for(size_t i = 0; i < dane.get_size(); ++i)
       rezultat += dane[i].get_size();
     return rezultat;
   }
@@ -47,29 +47,29 @@ public:
 };
 
 void AdjacencyList::add_edge(size_t skad, size_t dokad, int waga) {
-  if((skad > dokad ? skad : dokad) >= dane.size()) //jesli probuje stworzyc krawedz nieistniejącą bo do nieistniejącego wierzchołka
+  if((skad > dokad ? skad : dokad) >= dane.get_size()) //jesli probuje stworzyc krawedz nieistniejącą bo do nieistniejącego wierzchołka
     throw std::invalid_argument("Próba stworzenia krawędzi do nieistniejącego wierzchołka!");
 
   dane[skad].push_back(Pair(waga, dokad)); //nie sprawdza czy nie doda pare razy, zreszta to tylko troche spowolni dzialanie a nie zepsuje
 }
 
 void AdjacencyList::remove_edge(size_t skad, size_t dokad) {
-  if((skad > dokad ? skad : dokad) >= dane.size()) //jesli probuje stworzyc krawedz nieistniejącą bo do nieistniejącego wierzchołka
+  if((skad > dokad ? skad : dokad) >= dane.get_size()) //jesli probuje stworzyc krawedz nieistniejącą bo do nieistniejącego wierzchołka
     throw std::invalid_argument("Próba usunięcia krawędzi do nieistniejącego wierzchołka!");
 
   size_t indeks = dane[skad].find_index(Pair(dokad, 0)); //da size jesli nie ma tej wartosci tam
-  if(indeks == dane.size())
+  if(indeks == dane.get_size())
     throw std::invalid_argument("Próba usunięcia niestniejącej krawędzi do wierzchołka!");
   dane[skad].remove_at(indeks);
 }
 
 //to troche jest tricky bo trzeba policzyc w kazdym indeksie ilosc wystapien i (no 1 albo 0 lol)
 size_t AdjacencyList::indeg(size_t i) const {
-  if(i >= dane.size())
+  if(i >= dane.get_size())
     return 0; //aaaa zostawcie mnie jak nie ma wierzcholka to nie ma sasiadow https://pl.wikipedia.org/wiki/Antynomia_Russella
 
   int rezultat = 0;
-  for(size_t j = 0; j < dane.size(); ++j) {
+  for(size_t j = 0; j < dane.get_size(); ++j) {
     if(dane[i].find(Pair(i, 0)) != nullptr && j != i)
       rezultat++;
   }
@@ -78,19 +78,19 @@ size_t AdjacencyList::indeg(size_t i) const {
 
 //łatwe, bo tylko ile jest na indeksie i
 size_t AdjacencyList::outdeg(size_t i) const {
-  if(i < dane.size())
+  if(i < dane.get_size())
     return dane[i].get_size();
   return 0; //aaaa i to nie problem bo nie zaklamuje prawdy a jedynie wytwarza nowego rodzaju prawde
 }
 
 bool AdjacencyList::has_edge(size_t skad, size_t dokad) const {
-  if((skad > dokad ? skad : dokad) >= dane.size()) //jesli probuje stworzyc krawedz nieistniejącą bo do nieistniejącego wierzchołka
+  if((skad > dokad ? skad : dokad) >= dane.get_size()) //jesli probuje stworzyc krawedz nieistniejącą bo do nieistniejącego wierzchołka
     return false;
   return (dane[skad].find(Pair(dokad, 0)) != nullptr);
 }
 
 const List<Pair>& AdjacencyList::neighbors(size_t i) const {
-  if(i >= dane.size()) //jesli probuje stworzyc krawedz nieistniejącą bo do nieistniejącego wierzchołka
+  if(i >= dane.get_size()) //jesli probuje stworzyc krawedz nieistniejącą bo do nieistniejącego wierzchołka
     throw std::invalid_argument("Próba pobrania sąsiadów nieistniejącego wierzchołka");
   return dane[i];
 }

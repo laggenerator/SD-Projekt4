@@ -16,10 +16,14 @@ class DynamicArray{
     
     void shrink();
     
-    public:
-    DynamicArray();
-    ~DynamicArray();
-    
+    public:    
+    DynamicArray() : dane(nullptr), rozmiar(0), pojemnosc(0) {}
+
+    ~DynamicArray() {
+      if(dane)
+        delete[] dane;
+    }
+
     void push_back(const T& wartosc);
     void push_front(const T& wartosc);
     void push_at(unsigned int n, T wartosc);
@@ -31,7 +35,7 @@ class DynamicArray{
     int find(T wartosc);
     T at_position(unsigned int n);
   
-    size_t size() const { return rozmiar; }
+    size_t get_size() const { return rozmiar; }
     size_t capacity() const { return pojemnosc; }
     
     void resize(std::size_t nowa_pojemnosc);
@@ -42,16 +46,6 @@ class DynamicArray{
     DynamicArray& operator=(const DynamicArray& inny);
 
 };
-
-template<typename T>
-DynamicArray<T>::DynamicArray() : dane(nullptr), rozmiar(0), pojemnosc(0) {}
-
-template<typename T>
-DynamicArray<T>::~DynamicArray() {
-  if(dane) {
-    delete[] dane;
-  }
-}
 
 template<typename T>
 void DynamicArray<T>::shrink() {
@@ -165,7 +159,7 @@ int DynamicArray<T>::find(T wartosc) {
   for(std::size_t i = 0; i < rozmiar; ++i) {
     if(dane[i] == wartosc) return i;
   }
-  return -1;
+  return rozmiar;
 }
 
 template<typename T>
@@ -216,5 +210,6 @@ DynamicArray<T>& DynamicArray<T>::operator=(const DynamicArray& inny) {
   }
   return *this;
 }
+
 
 #endif

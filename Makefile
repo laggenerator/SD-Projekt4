@@ -1,10 +1,10 @@
 CXX = g++
-CXXFLAGS = -Wall -Wextra -pedantic -std=c++17 -O0
+CXXFLAGS = -Wall -Wextra -pedantic -std=c++17 -O0 -g
 
 TARGET = egzek
 
 SRCS = main.cpp ./struktury/heap.cpp
-HEADERS = ./struktury/dynamic_array.hh ./struktury/list.hh ./struktury/adjacency_list.hh ./struktury/pair.hh ./struktury/heap.hh ./struktury/prique.hh
+HEADERS = ./struktury/dynamic_array.hh ./struktury/list.hh ./struktury/adjacency_list.hh ./struktury/adjacency_matrix.hh ./struktury/pair.hh ./struktury/heap.hh ./struktury/prique.hh
 
 all: $(TARGET)
 
