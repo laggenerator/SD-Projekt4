@@ -1,5 +1,6 @@
 #include <iostream>
 #include <limits.h>
+#include <vector>
 #include "struktury/adjacency_list.hh"
 #include "struktury/prique.hh"
 
@@ -22,7 +23,6 @@ void Dijkstra(const AdjacencyList& graf, size_t skad, int* poprzednik, int* odle
 
   while(kolejka.size() != 0) {
     //relaksacja sasiadow najblizszego
-    kolejka._show();
     Pair u = kolejka.extract_min(); //najblizszy
     const List<Pair>& sasiedzi = graf.neighbors(u.get_val());
 
@@ -58,28 +58,28 @@ void sciezka(int skad, int dokad, int* odleglosci, int* poprzednicy) {
 }
 
 int main() {
-  AdjacencyList mujgraf(6);
-  mujgraf.add_edge(0, 1, 7);
-  mujgraf.add_edge(0, 2, 9);
-  mujgraf.add_edge(0, 5, 14);
-  mujgraf.add_edge(1, 2, 10);
-  mujgraf.add_edge(1, 3, 15);
-  mujgraf.add_edge(2, 3, 11);
-  mujgraf.add_edge(2, 5, 2);
-  mujgraf.add_edge(3, 4, 6);
-  mujgraf.add_edge(4, 5, 9);
+  std::vector<std::tuple<int, int, int>> edges = {
+    {0, 1, 1}, {1, 2, 1}, {2, 3, 1}, {3, 1, 1} // przykład z grafu 1
+  };
+  AdjacencyList mujgraf(4); // dopasuj do liczby wierzchołków
+
+  for (const auto& [u, v, w] : edges) {
+    mujgraf.add_edge(u, v, w);
+    // jeśli nieskierowany: mujgraf.add_edge(v, u, w);
+  }
 
   int* poprzednicy = new int[mujgraf.vertex_count()];
   int* odleglosci = new int[mujgraf.vertex_count()];
-  Dijkstra(mujgraf, 0, poprzednicy, odleglosci);
+  Dijkstra(mujgraf, 3, poprzednicy, odleglosci);
 
-  sciezka(0, 0, odleglosci, poprzednicy);
-  sciezka(0, 1, odleglosci, poprzednicy);
-  sciezka(0, 2, odleglosci, poprzednicy);
-  sciezka(0, 3, odleglosci, poprzednicy);
-  sciezka(0, 4, odleglosci, poprzednicy);
-  sciezka(0, 5, odleglosci, poprzednicy);
-
+  for(int i = 0; i < mujgraf.vertex_count(); ++i) {
+    std::cout << odleglosci[i] << " ";
+  }
+  std::cout << "\n";
+  for(int i = 0; i < mujgraf.vertex_count(); ++i) {
+    std::cout << poprzednicy[i] << " ";
+  }
+  
   std::cout << "papa" << std::endl;
   delete[] poprzednicy;
   delete[] odleglosci;
