@@ -120,6 +120,7 @@ const DynamicArray<Pair> AdjacencyMatrix::neighbors(size_t i) const {
   for(size_t j=0;j<vertex_count();j++){
     const Pair& krawedz = dane[i][j];
     if(krawedz.get_key() == 1){
+      // Zwraca parę <waga, numer wierzchołka>
       wynik.push_back(Pair(krawedz.get_val(), j));
     }
   }

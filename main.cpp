@@ -4,79 +4,7 @@
 #include "struktury/adjacency_list.hh"
 #include "struktury/prique.hh"
 #include "struktury/adjacency_matrix.hh"
-
-void Dijkstra(const AdjacencyList& graf, size_t skad, int* poprzednik, int* odleglosc) {
-  const size_t size = graf.vertex_count();
-  if(skad >= size) {
-    std::cerr << "Nie wyznaczę drogi do nieistniejącego węzła!" << std::endl;
-    return;
-  }
-
-  Prique kolejka;
-  for(size_t i = 0; i < size; i++) {
-    poprzednik[i] = -1;
-    odleglosc[i] = INT_MAX;
-    if(i == skad)
-      odleglosc[i] = 0;
-    kolejka.insert(Pair(odleglosc[i], i));
-  }
-
-  while(kolejka.size() != 0) {
-    //relaksacja sasiadow najblizszego
-    Pair u = kolejka.extract_min(); //najblizszy
-    const List<Pair>& sasiedzi = graf.neighbors(u.get_val());
-
-    for(size_t i = 0; i < sasiedzi.get_size(); ++i) { //dla kazdego sasiada
-      if (odleglosc[u.get_val()] == INT_MAX) continue;  //nie ma sensu relaksować, ponadto byłby overflow w nowa_odleglosc
-      Pair v = sasiedzi.at_position(i)->value();
-      int nowa_odleglosc = odleglosc[u.get_val()] + v.get_key();
-  
-      //nowa droga jest lepsza niz aktualnie zapisana -- zapisujemy
-      if(nowa_odleglosc < odleglosc[v.get_val()]) { 
-        odleglosc[v.get_val()] = nowa_odleglosc;
-	poprzednik[v.get_val()] = u.get_val();
-	kolejka.modify_key(v.get_val(), nowa_odleglosc); //zmiana na kolejke priorytetowa
-      }
-    }
-  }
-}
-
-void Didzikstra(const AdjacencyMatrix& graf, size_t skad, int* poprzednik, int* odleglosc){
-  const size_t size = graf.vertex_count();
-  if(skad >= size) {
-    std::cerr << "Nie wyznaczę drogi do nieistniejącego węzła!" << std::endl;
-    return;
-  }
-
-  Prique kolejka;
-  for(size_t i = 0; i < size; ++i) {
-    poprzednik[i] = -1;
-    odleglosc[i] = INT_MAX;
-    if(i == skad)
-      odleglosc[i] = 0;
-    kolejka.insert(Pair(odleglosc[i], i));
-  }
-
-  while(kolejka.size() != 0) {
-    //relaksacja sasiadow najblizszego
-    Pair u = kolejka.extract_min(); //najblizszy
-    const DynamicArray<Pair>& sasiedzi = graf.neighbors(u.get_val());
-    for(size_t i = 0; i < sasiedzi.get_size(); ++i) { //dla kazdego sasiada
-      if (odleglosc[u.get_val()] == INT_MAX) continue;  //nie ma sensu relaksować, ponadto byłby overflow w nowa_odleglosc
-      Pair v = sasiedzi[i];
-      int nowa_odleglosc = odleglosc[u.get_val()] + v.get_key();
-  
-      //nowa droga jest lepsza niz aktualnie zapisana -- zapisujemy
-      if(nowa_odleglosc < odleglosc[v.get_val()]) { 
-        odleglosc[v.get_val()] = nowa_odleglosc;
-        poprzednik[v.get_val()] = u.get_val();
-        kolejka.modify_key(v.get_val(), nowa_odleglosc); //zmiana na kolejke priorytetowa
-      }
-    }
-  }
-}
-
-
+#include "algorytmy.hh"
 
 //wyswietla
 void sciezka(int skad, int dokad, int* odleglosci, int* poprzednicy) {
@@ -99,8 +27,14 @@ int list_main() {
   //   {0, 1, 1}, {1, 2, 1}, {2, 3, 1}, {3, 1, 1} // przykład z grafu 1
   // };
   std::vector<std::tuple<int, int, int>> edges = {
-    {0, 1, 1}, {1, 2, 3}, {2, 3, 5}, {3, 1, 7} // przykład z grafu 1
+    {0, 1, 2}, {1, 2, -1}, {2, 3, 3}, {0, 3, 5} // przykład dla bellmana
   };
+  /* Wynik dla bellmana licząc z wierzchołka 0:
+    Do wierzchołka 0 => odległość = 0, poprzednik = -1  
+    Do wierzchołka 1 => odległość = 2, poprzednik = 0  
+    Do wierzchołka 2 => odległość = 1, poprzednik = 1  
+    Do wierzchołka 3 => odległość = 4, poprzednik = 2  
+  */
   AdjacencyList mujgraf(4); // dopasuj do liczby wierzchołków
   
   for (const auto& [u, v, w] : edges) {
@@ -112,12 +46,14 @@ int list_main() {
   
   int* poprzednicy = new int[mujgraf.vertex_count()];
   int* odleglosci = new int[mujgraf.vertex_count()];
-  Dijkstra(mujgraf, 3, poprzednicy, odleglosci);
-  
+  // Dijkstra(mujgraf, 3, poprzednicy, odleglosci);
+  BellmanFord(mujgraf, 0, poprzednicy, odleglosci);
+
+  std::cout << "Odległości: ";
   for(int i = 0; i < mujgraf.vertex_count(); ++i) {
     std::cout << odleglosci[i] << " ";
   }
-  std::cout << "\n";
+  std::cout << "\nPoprzednicy: ";
   for(int i = 0; i < mujgraf.vertex_count(); ++i) {
     std::cout << poprzednicy[i] << " ";
   }
@@ -134,9 +70,16 @@ int matrix_main() {
   // std::vector<std::tuple<int, int, int>> edges = {
   //   {0, 1, 1}, {1, 2, 1}, {2, 3, 1}, {3, 1, 1} // przykład z grafu 1
   // };
+
   std::vector<std::tuple<int, int, int>> edges = {
-    {0, 1, 1}, {1, 2, 3}, {2, 3, 5}, {3, 1, 7} // przykład z grafu 1
+    {0, 1, 2}, {1, 2, -1}, {2, 3, 3}, {0, 3, 5} // przykład dla bellmana
   };
+  /* Wynik dla bellmana licząc z wierzchołka 0:
+    Do wierzchołka 0 => odległość = 0, poprzednik = -1  
+    Do wierzchołka 1 => odległość = 2, poprzednik = 0  
+    Do wierzchołka 2 => odległość = 1, poprzednik = 1  
+    Do wierzchołka 3 => odległość = 4, poprzednik = 2  
+  */
   AdjacencyMatrix mujgraf(4); // dopasuj do liczby wierzchołków
   
   for (const auto& [u, v, w] : edges) {
@@ -148,12 +91,14 @@ int matrix_main() {
   
   int* poprzednicy = new int[mujgraf.vertex_count()];
   int* odleglosci = new int[mujgraf.vertex_count()];
-  Didzikstra(mujgraf, 3, poprzednicy, odleglosci);
+  // Didzikstra(mujgraf, 3, poprzednicy, odleglosci);
+  DzwonnikRenault(mujgraf, 0, poprzednicy, odleglosci);
   
+  std::cout << "Odległości: ";
   for(int i = 0; i < mujgraf.vertex_count(); ++i) {
     std::cout << odleglosci[i] << " ";
   }
-  std::cout << "\n";
+  std::cout << "\nPoprzednicy: ";
   for(int i = 0; i < mujgraf.vertex_count(); ++i) {
     std::cout << poprzednicy[i] << " ";
   }
