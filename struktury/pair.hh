@@ -12,8 +12,8 @@ public:
   Pair() : key(0), val(0) { }
 
   
-  int get_key() { return key; }
-  int get_val() { return val; }
+  int get_key() const { return key; }
+  int get_val() const { return val; }
   void set_key(int k) { key = k; }
   void set_val(int v) { val = v; }
 
