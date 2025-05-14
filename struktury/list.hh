@@ -65,7 +65,7 @@ public:
   Node<T>* at_position(size_t n) const;
   
   size_t get_size() const { return size; }
-  void _show();
+  void _show() const;
 
   friend std::ostream& operator<< <>(std::ostream&, const List<T>&);
 
@@ -286,7 +286,7 @@ Node<T>* List<T>::at_position(size_t n) const {
 }
 
 template <typename T>
-void List<T>::_show() {
+void List<T>::_show() const {
   Node<T>* iter = head;
   if(iter != nullptr) {
     do {
