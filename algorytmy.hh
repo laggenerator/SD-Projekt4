@@ -8,12 +8,14 @@
 #include "struktury/prique.hh"
 #include "struktury/adjacency_matrix.hh"
 
+// Zamieniłem funkcje na boole, żeby wiedzieć czy sciezka sie udala, głównie dla bellmana przydatne żeby testy wiedziały że jest ujemny cykl
+
 // Dla listy sąsiedztwa
-void Dijkstra(const IGraph* graf, size_t skad, int* poprzednik, int* odleglosc) {
+bool Dijkstra(const IGraph* graf, size_t skad, int* poprzednik, int* odleglosc) {
   const size_t size = graf->vertex_count();
   if(skad >= size) {
     std::cerr << "Nie wyznaczę drogi do nieistniejącego węzła!" << std::endl;
-    return;
+    return false;
   }
 
   Prique kolejka;
@@ -39,18 +41,19 @@ void Dijkstra(const IGraph* graf, size_t skad, int* poprzednik, int* odleglosc) 
       //nowa droga jest lepsza niz aktualnie zapisana -- zapisujemy
       if(nowa_odleglosc < odleglosc[v.get_val()]) { 
         odleglosc[v.get_val()] = nowa_odleglosc;
-	poprzednik[v.get_val()] = u.get_val();
-	kolejka.modify_key(v.get_val(), nowa_odleglosc); //zmiana na kolejke priorytetowa
+        poprzednik[v.get_val()] = u.get_val();
+        kolejka.modify_key(v.get_val(), nowa_odleglosc); //zmiana na kolejke priorytetowa
       }
     }
   }
+  return true;
 }
 
-void BellmanFord(const IGraph* graf, size_t skad, int* poprzednik, int* odleglosc) {
+bool BellmanFord(const IGraph* graf, size_t skad, int* poprzednik, int* odleglosc) {
   const size_t size = graf->vertex_count();
   if (skad >= size) {
     std::cerr << "Nie wyznaczę drogi do nieistniejącego węzła!" << std::endl;
-    return;
+    return false;
   }
 
   // Inicjalizacja
@@ -66,17 +69,17 @@ void BellmanFord(const IGraph* graf, size_t skad, int* poprzednik, int* odleglos
       List<Pair> sasiedzi;
       graf->neighbors(u, sasiedzi);
       for (size_t j = 0; j < sasiedzi.get_size(); ++j) {
-	Pair v = sasiedzi.at_position(j)->value();
-	int waga = v.get_key();
-	size_t v_indeks = v.get_val();
+      Pair v = sasiedzi.at_position(j)->value();
+      int waga = v.get_key();
+      size_t v_indeks = v.get_val();
 
-	if (odleglosc[u] != INT_MAX && odleglosc[u] + waga < odleglosc[v_indeks]) {
-	  odleglosc[v_indeks] = odleglosc[u] + waga;
-	  poprzednik[v_indeks] = u;
-	}
+      if (odleglosc[u] != INT_MAX && odleglosc[u] + waga < odleglosc[v_indeks]) {
+        odleglosc[v_indeks] = odleglosc[u] + waga;
+        poprzednik[v_indeks] = u;
       }
-    }
-  }
+          }
+        }
+      }
 
   // Sprawdzenie ujemnego cyklu
   for (size_t u = 0; u < size; ++u) {
@@ -88,11 +91,12 @@ void BellmanFord(const IGraph* graf, size_t skad, int* poprzednik, int* odleglos
       size_t v_indeks = v.get_val();
 
       if (odleglosc[u] != INT_MAX && odleglosc[u] + waga < odleglosc[v_indeks]) {
-	std::cerr << "Graf zawiera ujemny cykl!" << std::endl;
-	return;
+        std::cerr << "Graf zawiera ujemny cykl!" << std::endl;
+        return false;
       }
     }
   }
+  return true;
 }
 
 #endif
