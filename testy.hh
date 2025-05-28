@@ -18,8 +18,8 @@
 #define MIN_WAGA 10
 #define MAX_WAGA 1000
 // Testy wierzchołkowe od 2 do MAX_WIERZCHOŁKÓW, a krawędziowe wykorzystują MAX_WIERZCHOŁKÓW do testu
-#define MAX_WIERZCHOLKOW 10
-#define MAX_WIERZCHOLKOW_W_UJEMNYM 10
+#define MAX_WIERZCHOLKOW 100
+#define MAX_WIERZCHOLKOW_W_UJEMNYM 100
 // Przy ujemnych wagach ILOSC_PROB * 10 żeby dać większą szansę na brak ujemnych cykli
 #define ILOSC_PROB 5
 
@@ -106,41 +106,33 @@ void testWierzcholkowy(){
   zapisz("testWierzcholkowyDijkstra.csv", czasyDijkstra, MAX_WIERZCHOLKOW, false);
 }
 
-int ileKrawedzi(int wierzcholki, double procent){
-  if(wierzcholki < 1) return 0;
-  int min = wierzcholki;
-  int max = wierzcholki*(wierzcholki-1);
-  if(procent <= 0.0) return min;
-  if(procent >= 100.0) return max;
-  int odstep = max - min;
-  return (min + static_cast<int>(procent / 100.0 * odstep + 0.5));
-}
 // Załóżmy że jest robiony test dla V=100, bo to daje nam całkiem duży rozjazd i nie trwa godziny
 void testKrawedziowy(){
   int V=MAX_WIERZCHOLKOW;
-  
-  // Czasy dla % krawedzi -- 0% to K=V-1, 100% to K=V*(V-1)/2
+  int krok = 50;
+  int ile_danych = V*(V-2) / krok;
+  // Czasy dla % krawedzi -- 0% to K=0, , 100% to K=V*(V-1)/2
   //Macierz, lista sasiedztwa, lista krawedzi
   double** czasyDijkstra = new double*[3];
   double** czasyBellman = new double*[3];
   for(int i=0;i<3;i++){
-    czasyBellman[i] = new double[100]; 
-    czasyDijkstra[i] = new double[100];
+    czasyBellman[i] = new double[ile_danych]; 
+    czasyDijkstra[i] = new double[ile_danych];
   }
-  
-  for(int procent_krawedzi=0;procent_krawedzi<=100;procent_krawedzi++){
-    int krawedzi = ileKrawedzi(V, procent_krawedzi);
-    std::cout << procent_krawedzi << "% krawedzi = " << krawedzi << std::endl;
+  int xd = 0;
+  for(int ile_krawedzi=V;ile_krawedzi<=V*(V-1);ile_krawedzi+=krok){
+    std::cout << "Test [" << xd/(ile_danych*1.0) << "] -> " << ile_krawedzi << "/" << V*(V-1) << " = " << ile_krawedzi*1.0/(V*(V-1)) << "%" << std::endl;
     // Macierz sąsiedztwa
-    testPomocniczy(std::make_unique<AdjacencyMatrix>(V), V, krawedzi, czasyDijkstra[0][procent_krawedzi], czasyBellman[0][procent_krawedzi]);
+    testPomocniczy(std::make_unique<AdjacencyMatrix>(V), V, ile_krawedzi, czasyDijkstra[0][xd], czasyBellman[0][xd]);
     // Lista sąsiedztwa
-    testPomocniczy(std::make_unique<AdjacencyList>(V), V, krawedzi, czasyDijkstra[1][procent_krawedzi], czasyBellman[1][procent_krawedzi]);
+    testPomocniczy(std::make_unique<AdjacencyList>(V), V, ile_krawedzi, czasyDijkstra[1][xd], czasyBellman[1][xd]);
     // Lista krawędzi
-    testPomocniczy(std::make_unique<EdgeList>(V), V, krawedzi, czasyDijkstra[2][procent_krawedzi], czasyBellman[2][procent_krawedzi]);
+    testPomocniczy(std::make_unique<EdgeList>(V), V, ile_krawedzi, czasyDijkstra[2][xd], czasyBellman[2][xd]);
+    xd++;
   }
   
-  zapisz("testKrawedziowyBellman.csv", czasyBellman, 100, true);
-  zapisz("testKrawedziowyDijkstra.csv", czasyDijkstra, 100, true);
+  zapisz("testKrawedziowyBellman.csv", czasyBellman, ile_danych, true);
+  zapisz("testKrawedziowyDijkstra.csv", czasyDijkstra, ile_danych, true);
 }
 
 void testUjemnychKrawedzi(){
@@ -180,27 +172,28 @@ void testUjemnychKrawedzi(){
 
 void testAlgorytmuKrawedzie(){
   int V=MAX_WIERZCHOLKOW;
-  
+  int krok = 50;
+  int ile_danych = V*(V-2) / krok;
   // Czasy dla % krawedzi -- 0% to K=V-1, 100% to K=V*(V-1)/2
   //Macierz, lista sasiedztwa, lista krawedzi
   double** czasyDijkstra = new double*[3];
   double** czasyBellman = new double*[3];
   for(int i=0;i<3;i++){
-    czasyBellman[i] = new double[100]; 
-    czasyDijkstra[i] = new double[100];
+    czasyBellman[i] = new double[ile_danych]; 
+    czasyDijkstra[i] = new double[ile_danych];
+  }
+  int xd = 0;
+  for(int ile_krawedzi=V;ile_krawedzi<=V*(V-1);ile_krawedzi+=krok){
+    std::cout << "Test [" << xd << "] -> " << ile_krawedzi << "/" << V*(V-1) << " = " << ile_krawedzi*100.0/(V*(V-1)) << "%" << std::endl;
+    // Macierz sąsiedztwa
+    testPomocniczy(std::make_unique<AdjacencyMatrix>(V), V, ile_krawedzi, czasyDijkstra[0][xd], czasyDijkstra[1][xd]);
+    // Lista sąsiedztwa
+    testPomocniczy(std::make_unique<AdjacencyList>(V), V, ile_krawedzi, czasyBellman[0][xd], czasyBellman[1][xd]);
+    xd++;
   }
   
-  for(int procent_krawedzi=0;procent_krawedzi<=100;procent_krawedzi++){
-    int krawedzi = ileKrawedzi(V, procent_krawedzi);
-    std::cout << procent_krawedzi << "% krawedzi = " << krawedzi << std::endl;
-    // Macierz sąsiedztwa
-    testPomocniczy(std::make_unique<AdjacencyMatrix>(V), V, krawedzi, czasyDijkstra[0][procent_krawedzi], czasyDijkstra[1][procent_krawedzi]);
-    // Lista sąsiedztwa
-    testPomocniczy(std::make_unique<AdjacencyList>(V), V, krawedzi, czasyBellman[0][procent_krawedzi], czasyBellman[1][procent_krawedzi]);
-}
-  
-  zapiszAlgorytmy("algorytmKrawedzieMacierz.csv", czasyDijkstra, 100, true);
-  zapiszAlgorytmy("algorytmKrawedzieLista.csv", czasyBellman, 100, true);
+  zapiszAlgorytmy("algorytmKrawedzieMacierz.csv", czasyDijkstra, ile_danych, true);
+  zapiszAlgorytmy("algorytmKrawedzieLista.csv", czasyBellman, ile_danych, true);
 }
 
 void testAlgorytmuWierzcholki(){

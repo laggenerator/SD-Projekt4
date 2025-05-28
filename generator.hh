@@ -86,7 +86,7 @@ void zapisz(const char* nazwa_pliku, double** dane, size_t n, bool testKrawedzi,
     } else {
       plik << "Krawedzie;Macierz_sasiedztwa;Lista_sasiedztwa;Lista_krawedzi" << std::endl;
       for (size_t i = 0; i <= n; i += co_ile_zapis) {
-          plik << i;
+          plik << (i*50 + 100)/99.0;
           for (size_t j = 0; j < 3; ++j) {
               plik << ";" << dane[j][i];
           }
@@ -119,9 +119,9 @@ void zapiszAlgorytmy(const char* nazwa_pliku, double** dane, size_t n, bool test
       }
       plik << std::endl;
     } else {
-      plik << "Krawedzie;Dijkstra;BellmanFord" << std::endl;
+      plik << "Proc_krawedzi;Dijkstra;BellmanFord" << std::endl;
       for (size_t i = 0; i <= n; i += co_ile_zapis) {
-          plik << i;
+          plik << (i*50 + 100)/99.0;
           for (size_t j = 0; j < 2; ++j) {
               plik << ";" << dane[j][i];
           }

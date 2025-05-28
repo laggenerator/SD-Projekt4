@@ -17,11 +17,11 @@ int main(){
   // std::cout << "Porównanie reprezentacji zakoczone!" << std::endl;
 
 
-  std::cout << "Porównanie algorytmow rozpoczete!" << std::endl;
+  // std::cout << "Porównanie algorytmow rozpoczete!" << std::endl;
 
-  std::cout << "Test wierzcholkowy rozpoczety!" << std::endl;
-  testAlgorytmuWierzcholki();
-  std::cout << "Test wierzcholkowy zakonczony!" << std::endl;
+  // std::cout << "Test wierzcholkowy rozpoczety!" << std::endl;
+  // testAlgorytmuWierzcholki();
+  // std::cout << "Test wierzcholkowy zakonczony!" << std::endl;
 
   std::cout << "Test krawedziowy rozpoczety!" << std::endl;
   testAlgorytmuKrawedzie();
