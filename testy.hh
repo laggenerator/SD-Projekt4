@@ -178,5 +178,51 @@ void testUjemnychKrawedzi(){
   zapisz("wierzcholowyTestUjemnychKrawedziBellman.csv", czasyBellman, MAX_WIERZCHOLKOW_W_UJEMNYM, false);
 }
 
+void testAlgorytmuKrawedzie(){
+  int V=MAX_WIERZCHOLKOW;
+  
+  // Czasy dla % krawedzi -- 0% to K=V-1, 100% to K=V*(V-1)/2
+  //Macierz, lista sasiedztwa, lista krawedzi
+  double** czasyDijkstra = new double*[3];
+  double** czasyBellman = new double*[3];
+  for(int i=0;i<3;i++){
+    czasyBellman[i] = new double[100]; 
+    czasyDijkstra[i] = new double[100];
+  }
+  
+  for(int procent_krawedzi=0;procent_krawedzi<=100;procent_krawedzi++){
+    int krawedzi = ileKrawedzi(V, procent_krawedzi);
+    std::cout << procent_krawedzi << "% krawedzi = " << krawedzi << std::endl;
+    // Macierz sąsiedztwa
+    testPomocniczy(std::make_unique<AdjacencyMatrix>(V), V, krawedzi, czasyDijkstra[0][procent_krawedzi], czasyDijkstra[1][procent_krawedzi]);
+    // Lista sąsiedztwa
+    testPomocniczy(std::make_unique<AdjacencyList>(V), V, krawedzi, czasyBellman[0][procent_krawedzi], czasyBellman[1][procent_krawedzi]);
+}
+  
+  zapiszAlgorytmy("algorytmKrawedzieMacierz.csv", czasyDijkstra, 100, true);
+  zapiszAlgorytmy("algorytmKrawedzieLista.csv", czasyBellman, 100, true);
+}
+
+void testAlgorytmuWierzcholki(){
+  //Macierz, lista sasiedztwa, lista krawedzi
+  double** czasyDijkstra = new double*[3];
+  double** czasyBellman = new double*[3];
+  for(int i=0;i<3;i++){
+    czasyBellman[i] = new double[MAX_WIERZCHOLKOW]; 
+    czasyDijkstra[i] = new double[MAX_WIERZCHOLKOW];
+  }
+  
+  // Minimum grafu to 2 wierzcholki bo jak krawedz wstawic
+  for(int wierzcholki=2;wierzcholki<=MAX_WIERZCHOLKOW;wierzcholki++){
+    std::cout << "Wierzcholki: " << wierzcholki << std::endl;
+    // Macierz sąsiedztwa
+    testPomocniczy(std::make_unique<AdjacencyMatrix>(wierzcholki), wierzcholki, wierzcholki*(wierzcholki-1), czasyBellman[0][wierzcholki], czasyBellman[1][wierzcholki]);
+    // Lista sąsiedztwa
+    testPomocniczy(std::make_unique<AdjacencyList>(wierzcholki), wierzcholki, wierzcholki*(wierzcholki-1), czasyDijkstra[0][wierzcholki], czasyDijkstra[1][wierzcholki]);
+  }
+  
+  zapiszAlgorytmy("algorytmWierzcholkiMacierz.csv", czasyBellman, MAX_WIERZCHOLKOW, false);
+  zapiszAlgorytmy("algorytmWierzcholkiLista.csv", czasyDijkstra, MAX_WIERZCHOLKOW, false);
+}
 
 #endif

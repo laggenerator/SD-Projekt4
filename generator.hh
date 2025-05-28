@@ -98,5 +98,40 @@ void zapisz(const char* nazwa_pliku, double** dane, size_t n, bool testKrawedzi,
 }
 
 
+void zapiszAlgorytmy(const char* nazwa_pliku, double** dane, size_t n, bool testKrawedzi, size_t co_ile_zapis = 1) {
+    std::ofstream plik(nazwa_pliku, std::ios::out | std::ios::trunc);
+    if (!plik.is_open()) {
+        std::cerr << "Nie można otworzyć pliku: " << nazwa_pliku << std::endl;
+        return;
+    }
+    if(!testKrawedzi){
+      plik << "Wierzcholki;Dijkstra;BellmanFord" << std::endl;
+      for (size_t i = 2; i < n; i += co_ile_zapis) {
+          plik << i;
+          for (size_t j = 0; j < 2; ++j) {
+              plik << ";" << dane[j][i];
+          }
+          plik << std::endl;
+      }
+      plik << n;
+      for (size_t j = 0; j < 2; ++j) {
+          plik << ";" << dane[j][n];
+      }
+      plik << std::endl;
+    } else {
+      plik << "Krawedzie;Dijkstra;BellmanFord" << std::endl;
+      for (size_t i = 0; i <= n; i += co_ile_zapis) {
+          plik << i;
+          for (size_t j = 0; j < 2; ++j) {
+              plik << ";" << dane[j][i];
+          }
+          plik << std::endl;
+      }
+    }
+
+    plik.close();
+}
+
+
 
 #endif
