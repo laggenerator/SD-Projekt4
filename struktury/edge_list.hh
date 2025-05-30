@@ -5,28 +5,6 @@
 #include "list.hh"
 #include "graf.hh"
 
-struct Edge {
-public:
-    int source;
-    int destination;
-    int weight;
-
-  Edge() : source(0), destination(0), weight(0) {}
-  Edge(int s, int d, int w) : source(s), destination(d), weight(w) {}
-  //operatory np do wyszukiwania w liscie
-  bool operator==(const Edge& e) const {
-    return (source == e.source && destination == e.destination);
-  }
-  bool operator!=(const Edge& e) const {
-    return !(*this == e);
-  }
-  friend std::ostream& operator<<(std::ostream& os, const Edge& e);
-};
-
-inline std::ostream& operator<<(std::ostream& os, const Edge& p) {
-  os << "(" << p.source << "|" << p.destination << "|" << p.weight << ")";
-  return os;
-}
 
 //numerujmy wierzchołki od 0, size_t
 //wierzchołki przechowywane jako pary, gdzie klucz to waga, wartosc to numer wierzcholka
@@ -53,6 +31,7 @@ public:
   bool has_edge(size_t skad, size_t dokad) const override ;
   //zwraca liste sasiadow, przyda sie w tak zwanej didżistrze
   void neighbors(size_t i, List<Pair>& wynik) const override ;
+  DynamicArray<Edge> edges() const override;
 
   //de facto ilosc krawedzi
   size_t vertex_count() const override { return rozmiar; }
@@ -109,6 +88,9 @@ void EdgeList::neighbors(size_t i, List<Pair>& wynik) const {
     if(size_t(rozpatrywana.source) == i)
       wynik.push_back(Pair(rozpatrywana.weight, rozpatrywana.destination));
   }
+}
+DynamicArray<Edge> EdgeList::edges() const {
+  return dane.getElements();
 }
 
 #endif //ADJ_LIST

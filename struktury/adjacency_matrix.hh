@@ -33,6 +33,8 @@ class AdjacencyMatrix : public IGraph{
     bool has_edge(size_t skad, size_t dokad) const override;
     //zwraca liste sasiadow, przyda sie w tak zwanej didżistrze
     void neighbors(size_t i, List<Pair>& wynik) const override;
+    // zwraca liste krawedzi w grafie
+    DynamicArray<Edge> edges() const override;
   
     //de facto ilosc krawedzi
     size_t vertex_count() const override { return dane.get_size(); }
@@ -124,6 +126,19 @@ void AdjacencyMatrix::neighbors(size_t i, List<Pair>& wynik) const {
       wynik.push_back(Pair(krawedz.get_val(), j));
     }
   }
+}
+
+DynamicArray<Edge> AdjacencyMatrix::edges() const {
+  DynamicArray<Edge> wynik;
+  for(size_t skad=0;skad<vertex_count(); skad++){
+    for(size_t dokad=0;dokad<vertex_count();dokad++){
+      const Pair& krawedz = dane[skad][dokad];
+      if(krawedz.get_key() == 1){
+        wynik.push_back(Edge(skad, dokad, krawedz.get_val()));
+      }
+    }
+  }
+  return wynik;
 }
 
 #endif

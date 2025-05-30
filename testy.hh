@@ -20,6 +20,7 @@
 // Testy wierzchołkowe od 2 do MAX_WIERZCHOŁKÓW, a krawędziowe wykorzystują MAX_WIERZCHOŁKÓW do testu
 #define MAX_WIERZCHOLKOW 100
 #define MAX_WIERZCHOLKOW_W_UJEMNYM 100
+#define MAX_WIERZCHOLKOW_GESTOSC 30
 // Przy ujemnych wagach ILOSC_PROB * 10 żeby dać większą szansę na brak ujemnych cykli
 #define ILOSC_PROB 5
 
@@ -29,8 +30,8 @@ void testPomocniczy(std::unique_ptr<IGraph> graf, const int wierzcholkow, const 
   czasDijkstra = 0;
   czasBellman = 0;
 
-  int przezIleDzielic[2] = {ILOSC_PROB, (ujemneWagi ? ILOSC_PROB * 10 : ILOSC_PROB)}; // Didżikstra, Bellman - zmiejsza się gdy będzie ujemny cykl bo wtedy czas jest zero bo nie może znaleźć ścieżki
-  for(int i=0;i<(ujemneWagi ? ILOSC_PROB * 10 : ILOSC_PROB);i++){
+  int przezIleDzielic[2] = {ILOSC_PROB,ILOSC_PROB}; // Didżikstra, Bellman - zmiejsza się gdy będzie ujemny cykl bo wtedy czas jest zero bo nie może znaleźć ścieżki
+  for(int i=0;i<ILOSC_PROB;i++){
     // Tworzenie grafu spójnego, skierowanego, z wagami i bez pętli
     std::vector<std::tuple<int, int, int>> edging = generujGraf(wierzcholkow, krawedzie, MIN_WAGA, MAX_WAGA, ujemneWagi);
   
@@ -61,8 +62,9 @@ void testPomocniczy(std::unique_ptr<IGraph> graf, const int wierzcholkow, const 
   
     auto start = std::chrono::high_resolution_clock::now();
     if(!(BellmanFord(graf.get(), punkt_startowy, poprzednicy, odleglosci))){
-      czasBellman += 0;
-      przezIleDzielic[1] -= 1;
+      auto end = std::chrono::high_resolution_clock::now();
+      std::chrono::duration<double, std::nano> czas = end - start;
+      czasBellman += czas.count();
     } else {
       auto end = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double, std::nano> czas = end - start;
@@ -93,13 +95,14 @@ void testWierzcholkowy(){
   
   // Minimum grafu to 2 wierzcholki bo jak krawedz wstawic
   for(int wierzcholki=2;wierzcholki<=MAX_WIERZCHOLKOW;wierzcholki++){
+    int ile_krawedzi = wierzcholki;
     std::cout << "Wierzcholki: " << wierzcholki << std::endl;
     // Macierz sąsiedztwa
-    testPomocniczy(std::make_unique<AdjacencyMatrix>(wierzcholki), wierzcholki, wierzcholki*(wierzcholki-1), czasyDijkstra[0][wierzcholki], czasyBellman[0][wierzcholki]);
+    testPomocniczy(std::make_unique<AdjacencyMatrix>(wierzcholki), wierzcholki, ile_krawedzi, czasyDijkstra[0][wierzcholki], czasyBellman[0][wierzcholki]);
     // Lista sąsiedztwa
-    testPomocniczy(std::make_unique<AdjacencyList>(wierzcholki), wierzcholki, wierzcholki*(wierzcholki-1), czasyDijkstra[1][wierzcholki], czasyBellman[1][wierzcholki]);
+    testPomocniczy(std::make_unique<AdjacencyList>(wierzcholki), wierzcholki, ile_krawedzi, czasyDijkstra[1][wierzcholki], czasyBellman[1][wierzcholki]);
     // Lista krawędzi
-    testPomocniczy(std::make_unique<EdgeList>(wierzcholki), wierzcholki, wierzcholki*(wierzcholki-1), czasyDijkstra[2][wierzcholki], czasyBellman[2][wierzcholki]);
+    testPomocniczy(std::make_unique<EdgeList>(wierzcholki), wierzcholki, ile_krawedzi, czasyDijkstra[2][wierzcholki], czasyBellman[2][wierzcholki]);
   }
   
   zapisz("testWierzcholkowyBellman.csv", czasyBellman, MAX_WIERZCHOLKOW, false);
@@ -108,7 +111,7 @@ void testWierzcholkowy(){
 
 // Załóżmy że jest robiony test dla V=100, bo to daje nam całkiem duży rozjazd i nie trwa godziny
 void testKrawedziowy(){
-  int V=MAX_WIERZCHOLKOW;
+  int V=MAX_WIERZCHOLKOW_GESTOSC;
   int krok = 50;
   int ile_danych = V*(V-2) / krok;
   // Czasy dla % krawedzi -- 0% to K=0, , 100% to K=V*(V-1)/2
@@ -146,22 +149,25 @@ void testUjemnychKrawedzi(){
   
   // Minimum grafu to 2 wierzcholki bo jak krawedz wstawic
   for(int wierzcholki=2;wierzcholki<=MAX_WIERZCHOLKOW_W_UJEMNYM;wierzcholki++){
-    std::cout << "Wierzcholki: " << wierzcholki << std::endl;
+    
+    int ile_krawedzi = wierzcholki*1.5;
+    if(wierzcholki == 2) ile_krawedzi = 2;
+    std::cout << "Wierzcholki: " << wierzcholki << " krawedzie: " << ile_krawedzi << std::endl;
     // Macierz sąsiedztwa
     try{
-      testPomocniczy(std::make_unique<AdjacencyMatrix>(wierzcholki), wierzcholki, wierzcholki*(wierzcholki-1), czasyDijkstra[0][wierzcholki], czasyBellman[0][wierzcholki], 0, true);
+      testPomocniczy(std::make_unique<AdjacencyMatrix>(wierzcholki), wierzcholki, ile_krawedzi, czasyDijkstra[0][wierzcholki], czasyBellman[0][wierzcholki], 0, true);
     } catch (const std::runtime_error& e){
       std::cerr << "Err: " << e.what() << std::endl;
     }
     // Lista sąsiedztwa
     try{
-      testPomocniczy(std::make_unique<AdjacencyList>(wierzcholki), wierzcholki, wierzcholki*(wierzcholki-1), czasyDijkstra[1][wierzcholki], czasyBellman[1][wierzcholki], 0, true);
+      testPomocniczy(std::make_unique<AdjacencyList>(wierzcholki), wierzcholki, ile_krawedzi, czasyDijkstra[1][wierzcholki], czasyBellman[1][wierzcholki], 0, true);
     } catch (const std::runtime_error& e){
       std::cerr << "Err: " << e.what() << std::endl;
     }
     // Lista krawędzi
     try{
-      testPomocniczy(std::make_unique<EdgeList>(wierzcholki), wierzcholki, wierzcholki*(wierzcholki-1), czasyDijkstra[2][wierzcholki], czasyBellman[2][wierzcholki], 0, true);
+      testPomocniczy(std::make_unique<EdgeList>(wierzcholki), wierzcholki, ile_krawedzi, czasyDijkstra[2][wierzcholki], czasyBellman[2][wierzcholki], 0, true);
     } catch (const std::runtime_error& e){
       std::cerr << "Err: " << e.what() << std::endl;
     }
@@ -171,7 +177,7 @@ void testUjemnychKrawedzi(){
 }
 
 void testAlgorytmuKrawedzie(){
-  int V=MAX_WIERZCHOLKOW;
+  int V=MAX_WIERZCHOLKOW_GESTOSC;
   int krok = 50;
   int ile_danych = V*(V-2) / krok;
   // Czasy dla % krawedzi -- 0% to K=V-1, 100% to K=V*(V-1)/2
@@ -207,11 +213,12 @@ void testAlgorytmuWierzcholki(){
   
   // Minimum grafu to 2 wierzcholki bo jak krawedz wstawic
   for(int wierzcholki=2;wierzcholki<=MAX_WIERZCHOLKOW;wierzcholki++){
+    int ile_krawedzi = wierzcholki;
     std::cout << "Wierzcholki: " << wierzcholki << std::endl;
     // Macierz sąsiedztwa
-    testPomocniczy(std::make_unique<AdjacencyMatrix>(wierzcholki), wierzcholki, wierzcholki*(wierzcholki-1), czasyBellman[0][wierzcholki], czasyBellman[1][wierzcholki]);
+    testPomocniczy(std::make_unique<AdjacencyMatrix>(wierzcholki), wierzcholki, ile_krawedzi, czasyBellman[0][wierzcholki], czasyBellman[1][wierzcholki]);
     // Lista sąsiedztwa
-    testPomocniczy(std::make_unique<AdjacencyList>(wierzcholki), wierzcholki, wierzcholki*(wierzcholki-1), czasyDijkstra[0][wierzcholki], czasyDijkstra[1][wierzcholki]);
+    testPomocniczy(std::make_unique<AdjacencyList>(wierzcholki), wierzcholki, ile_krawedzi, czasyDijkstra[0][wierzcholki], czasyDijkstra[1][wierzcholki]);
   }
   
   zapiszAlgorytmy("algorytmWierzcholkiMacierz.csv", czasyBellman, MAX_WIERZCHOLKOW, false);

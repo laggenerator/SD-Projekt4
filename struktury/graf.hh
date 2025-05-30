@@ -5,6 +5,29 @@
 #include "pair.hh"
 #include "list.hh"
 
+struct Edge {
+    public:
+        int source;
+        int destination;
+        int weight;
+    
+      Edge() : source(0), destination(0), weight(0) {}
+      Edge(int s, int d, int w) : source(s), destination(d), weight(w) {}
+      //operatory np do wyszukiwania w liscie
+      bool operator==(const Edge& e) const {
+        return (source == e.source && destination == e.destination);
+      }
+      bool operator!=(const Edge& e) const {
+        return !(*this == e);
+      }
+      friend std::ostream& operator<<(std::ostream& os, const Edge& e);
+    };
+    
+    inline std::ostream& operator<<(std::ostream& os, const Edge& p) {
+      os << "(" << p.source << "|" << p.destination << "|" << p.weight << ")";
+      return os;
+}
+
 class IGraph {
 public:
     virtual ~IGraph() {}
@@ -26,6 +49,8 @@ public:
 
     //wypełnia podaną listę sąsiadami wierzchołka 'i'
     virtual void neighbors(size_t i, List<Pair>& wynik) const = 0;
+    // wypełnia podaną listę krawędziami w grafie
+    virtual DynamicArray<Edge> edges() const = 0;
 
     //zwraca liczbę wierzchołków
     virtual size_t vertex_count() const = 0;

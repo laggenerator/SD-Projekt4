@@ -1,6 +1,8 @@
 #ifndef LISTA_H
 #define LISTA_H
 
+#include "dynamic_array.hh"
+
 template <typename T>
 class List;
 template <typename T>
@@ -63,6 +65,8 @@ public:
   Node<T>* find(T val) const;
   size_t find_index(T val) const;
   Node<T>* at_position(size_t n) const;
+
+  DynamicArray<T> getElements() const;
   
   size_t get_size() const { return size; }
   void _show() const;
@@ -308,6 +312,21 @@ void List<T>::_show() const {
     std::cout << "Lista jest pusta!" << std::endl;
 }
 
-
+template <typename T>
+DynamicArray<T> List<T>::getElements() const {
+  // std::cout << "Robie array" << std::endl;
+  DynamicArray<T> wynik;
+  // std::cout << "Zrobilem array" << std::endl;
+  Node<T>* iter = head;
+  if(iter != nullptr){
+    do{
+      wynik.push_back(iter->val);
+      // std::cout << "Dodalem cos" << std::endl;
+      iter = iter->next;
+    } while(iter != nullptr);
+  }
+  // std::cout << "Oddaje array" << std::endl;
+  return wynik;
+}
 
 #endif

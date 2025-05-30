@@ -49,7 +49,7 @@ bool Dijkstra(const IGraph* graf, size_t skad, int* poprzednik, int* odleglosc) 
   return true;
 }
 
-bool BellmanFord(const IGraph* graf, size_t skad, int* poprzednik, int* odleglosc) {
+bool StaryBellmanFord(const IGraph* graf, size_t skad, int* poprzednik, int* odleglosc) {
   const size_t size = graf->vertex_count();
   if (skad >= size) {
     std::cerr << "Nie wyznaczę drogi do nieistniejącego węzła!" << std::endl;
@@ -97,6 +97,45 @@ bool BellmanFord(const IGraph* graf, size_t skad, int* poprzednik, int* odleglos
     }
   }
   return true;
+}
+
+bool BellmanFord(const IGraph* graf, size_t skad, int* poprzednik, int* odleglosc) {
+  const size_t size = graf->vertex_count();
+  if (skad >= size) {
+    std::cerr << "Nie wyznaczę drogi do nieistniejącego węzła!" << std::endl;
+    return false;
+  }
+
+  // Inicjalizacja
+  for (size_t i = 0; i < size; ++i) {
+    poprzednik[i] = -1;
+    odleglosc[i] = INT_MAX;
+  }
+  odleglosc[skad] = 0;
+  DynamicArray<Edge> edges = graf->edges();
+
+  // Relaksacja wszystkich krawędzi (V-1 razy)
+  for (size_t i = 0; i < size -1; i++) {
+    for (size_t j = 0; j < edges.get_size(); j++) {
+        const Edge& e = edges[j];
+        if (odleglosc[e.source] != INT_MAX && odleglosc[e.source] + e.weight < odleglosc[e.destination]) {
+            odleglosc[e.destination] = odleglosc[e.source] + e.weight;
+            poprzednik[e.destination] = e.source;
+        }
+    }
+  }
+
+  // Ostatnia relaksacja dla sprawdzenia ujemnego cyklu
+  for (size_t j = 0; j < edges.get_size(); j++) {
+    const Edge& e = edges[j];
+    if (odleglosc[e.source] != INT_MAX && 
+        odleglosc[e.source] + e.weight < odleglosc[e.destination]) {
+        std::cerr << "Graf zawiera ujemny cykl!" << std::endl;
+        return false;
+    }
+  }
+  return true;
+
 }
 
 #endif

@@ -33,6 +33,8 @@ public:
   bool has_edge(size_t skad, size_t dokad) const override ;
   //zwraca liste sasiadow, przyda sie w tak zwanej didżistrze
   void neighbors(size_t i, List<Pair>& wynik) const override ;
+  // zwraca liste krawedzi w grafie
+  DynamicArray<Edge> edges() const override;
 
   //de facto ilosc krawedzi
   size_t vertex_count() const override { return dane.get_size(); }
@@ -94,6 +96,18 @@ void AdjacencyList::neighbors(size_t i, List<Pair>& wynik) const {
   if(i >= dane.get_size()) //jesli probuje stworzyc krawedz nieistniejącą bo do nieistniejącego wierzchołka
     throw std::invalid_argument("Próba pobrania sąsiadów nieistniejącego wierzchołka");
   wynik = dane[i];
+}
+
+DynamicArray<Edge> AdjacencyList::edges() const {
+  DynamicArray<Edge> wynik;
+  for(size_t skad=0;skad<vertex_count(); skad++){
+    DynamicArray<Pair> krawedzie = dane[skad].getElements();
+    size_t size = krawedzie.get_size();
+    for(size_t i=0;i<size;i++){
+      wynik.push_back(Edge(skad, krawedzie[i].get_val(), krawedzie[i].get_key()));
+    }
+  }
+  return wynik;
 }
 
 #endif //ADJ_LIST
