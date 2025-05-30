@@ -18,9 +18,9 @@
 #define MIN_WAGA 10
 #define MAX_WAGA 1000
 // Testy wierzchołkowe od 2 do MAX_WIERZCHOŁKÓW, a krawędziowe wykorzystują MAX_WIERZCHOŁKÓW do testu
-#define MAX_WIERZCHOLKOW 100
-#define MAX_WIERZCHOLKOW_W_UJEMNYM 100
-#define MAX_WIERZCHOLKOW_GESTOSC 30
+#define MAX_WIERZCHOLKOW 150
+#define MAX_WIERZCHOLKOW_W_UJEMNYM 150
+#define MAX_WIERZCHOLKOW_GESTOSC 150
 // Przy ujemnych wagach ILOSC_PROB * 10 żeby dać większą szansę na brak ujemnych cykli
 #define ILOSC_PROB 5
 
@@ -95,7 +95,7 @@ void testWierzcholkowy(){
   
   // Minimum grafu to 2 wierzcholki bo jak krawedz wstawic
   for(int wierzcholki=2;wierzcholki<=MAX_WIERZCHOLKOW;wierzcholki++){
-    int ile_krawedzi = wierzcholki;
+    int ile_krawedzi = wierzcholki*(wierzcholki-1);
     std::cout << "Wierzcholki: " << wierzcholki << std::endl;
     // Macierz sąsiedztwa
     testPomocniczy(std::make_unique<AdjacencyMatrix>(wierzcholki), wierzcholki, ile_krawedzi, czasyDijkstra[0][wierzcholki], czasyBellman[0][wierzcholki]);
@@ -150,7 +150,7 @@ void testUjemnychKrawedzi(){
   // Minimum grafu to 2 wierzcholki bo jak krawedz wstawic
   for(int wierzcholki=2;wierzcholki<=MAX_WIERZCHOLKOW_W_UJEMNYM;wierzcholki++){
     
-    int ile_krawedzi = wierzcholki*1.5;
+    int ile_krawedzi = wierzcholki*(wierzcholki-1);
     if(wierzcholki == 2) ile_krawedzi = 2;
     std::cout << "Wierzcholki: " << wierzcholki << " krawedzie: " << ile_krawedzi << std::endl;
     // Macierz sąsiedztwa
@@ -213,7 +213,7 @@ void testAlgorytmuWierzcholki(){
   
   // Minimum grafu to 2 wierzcholki bo jak krawedz wstawic
   for(int wierzcholki=2;wierzcholki<=MAX_WIERZCHOLKOW;wierzcholki++){
-    int ile_krawedzi = wierzcholki;
+    int ile_krawedzi = wierzcholki*(wierzcholki-1);
     std::cout << "Wierzcholki: " << wierzcholki << std::endl;
     // Macierz sąsiedztwa
     testPomocniczy(std::make_unique<AdjacencyMatrix>(wierzcholki), wierzcholki, ile_krawedzi, czasyBellman[0][wierzcholki], czasyBellman[1][wierzcholki]);

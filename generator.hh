@@ -70,7 +70,7 @@ void zapisz(const char* nazwa_pliku, double** dane, size_t n, bool testKrawedzi,
         return;
     }
     if(!testKrawedzi){
-      plik << "Wierzcholki;Macierz_sasiedztwa;Lista_sasiedztwa;Lista_krawedzi" << std::endl;
+      plik << "n;Macierz_sasiedztwa;Lista_sasiedztwa;Lista_krawedzi" << std::endl;
       for (size_t i = 2; i < n; i += co_ile_zapis) {
           plik << i;
           for (size_t j = 0; j < 3; ++j) {
@@ -84,7 +84,7 @@ void zapisz(const char* nazwa_pliku, double** dane, size_t n, bool testKrawedzi,
       }
       plik << std::endl;
     } else {
-      plik << "Krawedzie;Macierz_sasiedztwa;Lista_sasiedztwa;Lista_krawedzi" << std::endl;
+      plik << "n;Macierz_sasiedztwa;Lista_sasiedztwa;Lista_krawedzi" << std::endl;
       for (size_t i = 0; i <= n; i += co_ile_zapis) {
           plik << (i*50 + 100)/99.0;
           for (size_t j = 0; j < 3; ++j) {
@@ -105,7 +105,7 @@ void zapiszAlgorytmy(const char* nazwa_pliku, double** dane, size_t n, bool test
         return;
     }
     if(!testKrawedzi){
-      plik << "Wierzcholki;Dijkstra;BellmanFord" << std::endl;
+      plik << "n;Dijkstra;BellmanFord" << std::endl;
       for (size_t i = 2; i < n; i += co_ile_zapis) {
           plik << i;
           for (size_t j = 0; j < 2; ++j) {
@@ -119,7 +119,7 @@ void zapiszAlgorytmy(const char* nazwa_pliku, double** dane, size_t n, bool test
       }
       plik << std::endl;
     } else {
-      plik << "Proc_krawedzi;Dijkstra;BellmanFord" << std::endl;
+      plik << "n;Dijkstra;BellmanFord" << std::endl;
       for (size_t i = 0; i <= n; i += co_ile_zapis) {
           plik << (i*50 + 100)/99.0;
           for (size_t j = 0; j < 2; ++j) {
